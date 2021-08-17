@@ -1607,14 +1607,14 @@ static void lm3s6965evb_class_init(ObjectClass *oc, void *data)
 {
     MachineClass *mc = MACHINE_CLASS(oc);
 
-    mc->desc = "Stellaris LM3S6965EVB (Cortex-M3)";
+    mc->desc = "STM32_CORTEX_M4_GENERIC (Cortex-M4)";
     mc->init = lm3s6965evb_init;
     mc->ignore_memory_transaction_failures = true;
-    mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-m3");
+    mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-m4");
 }
 
 static const TypeInfo lm3s6965evb_type = {
-    .name = MACHINE_TYPE_NAME("lm3s6965evb"),
+    .name = MACHINE_TYPE_NAME("STM32_CORTEX_M4_GENERIC"),
     .parent = TYPE_MACHINE,
     .class_init = lm3s6965evb_class_init,
 };
