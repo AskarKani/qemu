@@ -113,9 +113,20 @@ config NETDUINOPLUS2
     bool
     select STM32F405_SOC
 
-config STM32_CORTEX_M4_GENERIC
+config ST_CM4_GEN
     bool
-    select STM32F405_SOC
+    select ARM_V7M
+    select CMSDK_APB_WATCHDOG
+    select I2C
+    select PL011 # UART
+    select PL022 # SPI
+    select PL061 # GPIO
+    select SSD0303 # OLED display
+    select SSD0323 # OLED display
+    select SSI_SD
+    select STELLARIS_INPUT
+    select STELLARIS_ENET # ethernet
+    select UNIMP
 
 config NSERIES
     bool

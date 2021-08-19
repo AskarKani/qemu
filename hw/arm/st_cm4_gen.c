@@ -29,6 +29,8 @@
 #include "hw/qdev-clock.h"
 #include "qom/object.h"
 
+#include "qemu/qemu-print.h"
+
 #define GPIO_A 0
 #define GPIO_B 1
 #define GPIO_C 2
@@ -57,7 +59,7 @@ typedef const struct {
 
 /* General purpose timer module.  */
 
-#define TYPE_STELLARIS_GPTM "stellaris-gptm"
+#define TYPE_STELLARIS_GPTM "stm32-cortex-m4-generic-gptm"
 OBJECT_DECLARE_SIMPLE_TYPE(gptm_state, STELLARIS_GPTM)
 
 struct gptm_state {
@@ -357,7 +359,7 @@ static void stellaris_gptm_realize(DeviceState *dev, Error **errp)
 
 /* System controller.  */
 
-#define TYPE_STELLARIS_SYS "stellaris-sys"
+#define TYPE_STELLARIS_SYS "stm32-cortex-m4-generic-sys"
 OBJECT_DECLARE_SIMPLE_TYPE(ssys_state, STELLARIS_SYS)
 
 struct ssys_state {
@@ -784,7 +786,7 @@ static DeviceState *stellaris_sys_init(uint32_t base, qemu_irq irq,
 
 /* I2C controller.  */
 
-#define TYPE_STELLARIS_I2C "stellaris-i2c"
+#define TYPE_STELLARIS_I2C "stm32-cortex-m4-generic-i2c"
 OBJECT_DECLARE_SIMPLE_TYPE(stellaris_i2c_state, STELLARIS_I2C)
 
 struct stellaris_i2c_state {
@@ -996,7 +998,7 @@ static void stellaris_i2c_init(Object *obj)
 #define STELLARIS_ADC_FIFO_EMPTY    0x0100
 #define STELLARIS_ADC_FIFO_FULL     0x1000
 
-#define TYPE_STELLARIS_ADC "stellaris-adc"
+#define TYPE_STELLARIS_ADC "stm32-cortex-m4-generic-adc"
 typedef struct StellarisADCState stellaris_adc_state;
 DECLARE_INSTANCE_CHECKER(stellaris_adc_state, STELLARIS_ADC,
                          TYPE_STELLARIS_ADC)
@@ -1530,6 +1532,7 @@ static void stellaris_init(MachineState *ms, stellaris_board_info *board)
     }
     if (board->dc4 & (1 << 28)) {
         DeviceState *enet;
+        qemu_printf("STM32_CORTEX_M4_GENERIC ethernet init ...\n");
         qemu_check_nic_model(&nd_table[0], "stellaris");
 
         enet = qdev_new("stellaris_enet");
@@ -1576,52 +1579,52 @@ static void stellaris_init(MachineState *ms, stellaris_board_info *board)
 }
 
 /* FIXME: Figure out how to generate these from stellaris_boards.  */
-static void lm3s811evb_init(MachineState *machine)
-{
-    stellaris_init(machine, &stellaris_boards[0]);
-}
+// static void lm3s811evb_init(MachineState *machine)
+// {
+//     stellaris_init(machine, &stellaris_boards[0]);
+// }
 
 static void lm3s6965evb_init(MachineState *machine)
 {
     stellaris_init(machine, &stellaris_boards[1]);
 }
 
-static void lm3s811evb_class_init(ObjectClass *oc, void *data)
+// static void lm3s811evb_class_init(ObjectClass *oc, void *data)
+// {
+//     MachineClass *mc = MACHINE_CLASS(oc);
+
+//     mc->desc = "Stellaris LM3S811EVB (Cortex-M3)";
+//     mc->init = lm3s811evb_init;
+//     mc->ignore_memory_transaction_failures = true;
+//     mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-m3");
+// }
+
+// static const TypeInfo lm3s811evb_type = {
+//     .name = MACHINE_TYPE_NAME("lm3s811evb"),
+//     .parent = TYPE_MACHINE,
+//     .class_init = lm3s811evb_class_init,
+// };
+
+static void STM32_CORTEX_M4_GENERIC_type_class_init(ObjectClass *oc, void *data)
 {
     MachineClass *mc = MACHINE_CLASS(oc);
 
-    mc->desc = "Stellaris LM3S811EVB (Cortex-M3)";
-    mc->init = lm3s811evb_init;
-    mc->ignore_memory_transaction_failures = true;
-    mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-m3");
-}
-
-static const TypeInfo lm3s811evb_type = {
-    .name = MACHINE_TYPE_NAME("lm3s811evb"),
-    .parent = TYPE_MACHINE,
-    .class_init = lm3s811evb_class_init,
-};
-
-static void lm3s6965evb_class_init(ObjectClass *oc, void *data)
-{
-    MachineClass *mc = MACHINE_CLASS(oc);
-
-    mc->desc = "Stellaris LM3S6965EVB (Cortex-M3)";
+    mc->desc = "STM32_CORTEX_M4_GENERIC (Cortex-M4)";
     mc->init = lm3s6965evb_init;
     mc->ignore_memory_transaction_failures = true;
-    mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-m3");
+    mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-m4");
 }
 
-static const TypeInfo lm3s6965evb_type = {
-    .name = MACHINE_TYPE_NAME("lm3s6965evb"),
+static const TypeInfo STM32_CORTEX_M4_GENERIC_type = {
+    .name = MACHINE_TYPE_NAME("STM32_CORTEX_M4_GENERIC"),
     .parent = TYPE_MACHINE,
-    .class_init = lm3s6965evb_class_init,
+    .class_init = STM32_CORTEX_M4_GENERIC_type_class_init,
 };
 
 static void stellaris_machine_init(void)
 {
-    type_register_static(&lm3s811evb_type);
-    type_register_static(&lm3s6965evb_type);
+    //type_register_static(&lm3s811evb_type);
+    type_register_static(&STM32_CORTEX_M4_GENERIC_type);
 }
 
 type_init(stellaris_machine_init)
@@ -1674,6 +1677,7 @@ static const TypeInfo stellaris_adc_info = {
 
 static void stellaris_sys_class_init(ObjectClass *klass, void *data)
 {
+    qemu_printf("..i2c \n");
     DeviceClass *dc = DEVICE_CLASS(klass);
     ResettableClass *rc = RESETTABLE_CLASS(klass);
 
